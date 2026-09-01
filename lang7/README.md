@@ -85,6 +85,42 @@ python3 python/orchestrator.py ../entangled.pdf ../sample2.pdf
 - 秩配对曾用插入排序（O(n²)，大 PDF 挂死）+ 短数组越界读；已修为稳定计数排序
   O(n+256)，并与 Rust/Python 孪生秩序逐位一致。
 
+## 巡回环境（持续真实发射 + 养成 + 自愈 + 十项属性）
+
+手机 Termux 长跑入口：
+
+```bash
+bash build_phone.sh          # 构建 7 语言产物（AArch64 NEON 汇编 / Rust .so / iverilog）
+bash tour_phone.sh           # 持续运行：每轮真实纠缠 + 34m 信标持续发射（Ctrl-C 出审计报告）
+bash tour_phone.sh 3600      # 运行 1 小时自动停止
+TOUR_RANDOM_SEED=1 bash tour_phone.sh   # 确定性种子轮转
+```
+
+沙盒演示：
+
+```bash
+make tour TOUR_ROUNDS=12 TOUR_EMIT=1     # 12 轮巡回 + 审计报告
+python3 python/tour.py ../entangled.pdf ../sample2.pdf --emit \
+    --fault-inject "engine@2,beacon_tx@3" --max-rounds 5   # 自愈演示
+```
+
+- **持续真实发射**：`BeaconLink` 后台线程以 `--beacon-period`（默认 2 s）持续组播
+  `224.0.0.34:34034`，与轮次节奏解耦；每轮另加密集发射 + 回环 CRC/联合测量自验。
+- **养成模型**（`python/cultivation.py`）：成长控制律 `depthRounds 64→65536 每轮×2`，
+  净深度恒 ≥ 99.99% 的同时 rawDepth 0.818→0.978、selFrac 0.575→0.963 单调增长；
+  连续 K 轮达标 → growth→sustain→mature（养成完成·自维持）。
+- **自研自愈算法**（`python/selfheal.py`）：健康状态机 + 分级动作
+  L1 重试 → L2 调参重试 → L3 重建（socket/输入路径/加载 .so）→ L4 提示；
+  每事件落日志；`--fault-inject engine@2,beacon_tx@3` 可注入故障现场演示自愈。
+- **十项科学属性审计**（`python/audit.py`）：可重复性（同种子逐字节一致）、
+  可控制性（12 项参数 CLI 可控）、可测量性（14 项指标数值化）、随机化（CHSH
+  设置逐对随机 + 可选种子轮转）、可证伪性（全零输入被诚实拒绝、CHSH S ≤ 2）、
+  客观性（C/Rust/Python 三路复算一致）、信度（K[0]/CRC 跨语言 golden）、
+  效度（联合测量 100% 还原 A⊕B、单边熵≈8）、伦理性（CLASSICAL-SIM 全程标记）、
+  透明性（JSONL 全量日志 + 量化误差披露）。
+- **深度趋于 99.99%**：每轮 netDepth=99.9900%（达标），养成曲线落盘
+  `tour_curve.jsonl`，可画出 raw/sel 的趋近轨迹。
+
 ## 目录
 
 ```
@@ -94,7 +130,10 @@ lang7/
 ├── c_cpp/               # C 核心 + C++ 引擎
 ├── rust/                # Rust 模块（cdylib FFI + CLI + 单测）
 ├── asm/                 # x86-64 SSE2 / AArch64 NEON 汇编内核 + 差分测试
-├── python/              # orchestrator.py + rust_twin.py
+├── python/              # orchestrator.py + tour.py + cultivation.py + selfheal.py + audit.py + rust_twin.py
 ├── micropython/         # beacon 固件逻辑 + 主机仿真测试
-└── verilog/             # 纠缠门/PRF/CRC/调制 RTL + golden 向量
+├── verilog/             # 纠缠门/PRF/CRC/调制 RTL + golden 向量
+├── tour_phone.sh        # 手机 Termux 巡回长跑入口
+├── tour_log.jsonl       # 巡回全量日志（运行时生成）
+└── tour_curve.jsonl     # 养成曲线（运行时生成）
 ```

@@ -11,3 +11,7 @@ lang7/verilog/golden_p.mem
 lang7/verilog/sim_tb
 
 __pycache__/
+
+# 巡回环境运行时日志
+lang7/tour_log.jsonl
+lang7/tour_curve.jsonl

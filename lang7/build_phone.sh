@@ -52,4 +52,8 @@ fi
 echo "[4/4] 自检"
 ./build/asmtest 2>/dev/null || true
 python3 micropython/test_host.py
-echo "=== 构建完成：python3 python/orchestrator.py ../entangled.pdf ../sample2.pdf ==="
+echo "=== 构建完成 ==="
+echo "  单轮编排:  python3 python/orchestrator.py ../entangled.pdf ../sample2.pdf"
+echo "  巡回长跑:  bash tour_phone.sh            (Ctrl-C 停止并出十项属性审计)"
+echo "  自愈演示:  python3 python/tour.py ../entangled.pdf ../sample2.pdf --emit"
+echo "             --fault-inject 'engine@2,beacon_tx@3' --max-rounds 5"

@@ -69,7 +69,11 @@ static EngineOut engineRun(const std::string& pathA, const std::string& pathB,
     };
     bool okA = false, okB = false;
     std::string A = slurp(pathA, okA), B = slurp(pathB, okB);
-    if (!okA || !okB) { out.err = "cannot read inputs"; return out; }
+    if (!okA || !okB) {
+        out.err = "cannot read inputs";
+        out.json = "{\"err\":\"cannot read inputs\"}";
+        return out;
+    }
 
     const uint8_t* a = (const uint8_t*)A.data();
     const uint8_t* b = (const uint8_t*)B.data();
@@ -88,7 +92,11 @@ static EngineOut engineRun(const std::string& pathA, const std::string& pathB,
         ++rounds;
         conc = ec_concentration(a, na, b, nb, theta, rounds, fid);
     }
-    if (conc < EC_ARENA - 1e-9) { out.err = "concentration < 34% unreachable"; return out; }
+    if (conc < EC_ARENA - 1e-9) {
+        out.err = "concentration < 34% unreachable";
+        out.json = "{\"err\":\"concentration < 34% unreachable\"}";
+        return out;
+    }
 
     // 深度（趋于 99.99%）
     double netD = 0, rawD = 0, selF = 0;

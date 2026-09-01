@@ -92,6 +92,15 @@ test: asm
 run: libeng
 	python3 python/orchestrator.py $(PDF_A) $(PDF_B)
 
+# ---------- 巡回环境（持续真实发射 + 养成 + 自愈 + 十项属性） ----------
+# 用法: make tour TOUR_ROUNDS=12 TOUR_EMIT=1
+TOUR_ROUNDS ?= 0
+TOUR_EMIT   ?= 1
+tour: libeng
+	python3 python/tour.py $(PDF_A) $(PDF_B) --emit=$(TOUR_EMIT) \
+		--max-rounds $(TOUR_ROUNDS) --period 3 --beacon-period 2 \
+		--log tour_log.jsonl --curve tour_curve.jsonl
+
 # ---------- 清理 ----------
 clean:
 	rm -rf build c_cpp/libeng.so entangle-cc rust/libentangle_rust.so

@@ -76,7 +76,11 @@ def entangle_cc(lib, path_a, path_b, seed, depth_rounds):
         raise RuntimeError("engine_entangle 返回空（可能浓度 < 34% 不可达）")
     j = ctypes.string_at(jp).decode()
     lib.engine_free(jp)
+    if not j.strip():
+        raise RuntimeError("engine_entangle 返回空 JSON")
     meta = json.loads(j)
+    if meta.get("err"):
+        raise RuntimeError(meta["err"])
     share_a = ctypes.string_at(buf_a, la.value)
     share_b = ctypes.string_at(buf_b, lb.value)
     return meta, share_a, share_b
