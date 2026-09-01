@@ -97,7 +97,7 @@ shareB[permB[r]] = b[permB[r]] ⊕ K[r]
 ## 构建与使用
 
 ```bash
-make                  # 编译（g++ -O2 -std=c++17）
+make                  # 编译（g++ 或 clang++ 自动检测，-O2 -std=c++17）
 make demo             # 纠缠仓库里的构想 PDF 与 sample2.pdf
 make verify           # 11 项真实性检验
 
@@ -106,6 +106,9 @@ make verify           # 11 项真实性检验
 ./entangle verify <out.pdf> <shareA.bin> <shareB.bin>
 ./entangle make-sample <sample.pdf>
 ```
+
+📱 **安卓手机 / Termux**：`make termux-setup` 一键装环境，完整教程见
+[`TERMUX.md`](TERMUX.md)。
 
 | 选项 | 含义 | 默认 |
 |---|---|---|
