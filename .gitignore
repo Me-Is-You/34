@@ -1,2 +1,9 @@
 # 编译产物（演示产物 entangled.pdf / shareA.bin / shareB.bin 是交付物，保留）
 /entangle
+
+# tour / audit 运行产生的目录与日志
+/inbox/
+/out/
+/journal.log
+/audit_work/
+/tour.log

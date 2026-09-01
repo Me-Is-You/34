@@ -1,0 +1,4 @@
+# entangle 养成模型 v1 —— 持续运行中在线学习（透明、可重建）
+# 行格式: PRIOR <bucket> <theta> <rounds> <fid> <n>
+# 桶 = f(熵A,熵B,规模)；模型损坏时可由 RUN 历史重建
+PRIOR e7-4-l1 1.570796 7 0.900000 1

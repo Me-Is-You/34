@@ -56,6 +56,7 @@ cp ~/storage/shared/Download/我的笔记.pdf ./
 
 ./entangle entangle 我的论文.pdf 我的笔记.pdf -o out.pdf --fast --report r.txt
 ./entangle verify out.pdf out.pdf.shareA.bin out.pdf.shareB.bin
+./entangle audit          # 十项科学属性审计（可选）
 ```
 
 参数速查：
@@ -63,9 +64,23 @@ cp ~/storage/shared/Download/我的笔记.pdf ./
 | 选项 | 说明 | 手机建议 |
 |---|---|---|
 | `--fast` | 快速模式（更少退火迭代、更小采样） | ✅ 推荐 |
+| `--depth-rounds <R>` | 深度提纯轮数（净深度趋于 99.99%） | 默认 `16384`，关掉用 `0` |
+| `--randomize-seed` | 每次真随机种子（随机化实验） | 想复现就关掉 |
 | `--seed <n>` | 纠缠种子 | 默认 `34` |
 | `--theta/--rounds` | 固定纠缠门角度/蒸馏轮数 | 想复现再固定 |
 | `--min-conc <x>` | 浓度下限（低于 34% 自动提升） | 别改，阿雷纳常数守恒 |
+
+## 4b. 持续运行巡回模式（养手机上的模型）
+
+```bash
+mkdir -p inbox out
+./entangle tour --in inbox --out out --journal journal.log --model model.txt --poll 10
+# 另一终端：把 PDF 丢进 inbox/
+cp ~/storage/shared/Download/我的论文.pdf inbox/
+cp ~/storage/shared/Download/我的笔记.pdf inbox/
+# tour 会自动成对纠缠 → 自检 → 写入 out/ → 养成模型（Ctrl-C 优雅停止）
+./entangle model    # 查看养成的先验
+```
 
 ## 5. 查看结果
 
