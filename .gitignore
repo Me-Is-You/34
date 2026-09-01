@@ -1,9 +1,13 @@
-# 编译产物（演示产物 entangled.pdf / shareA.bin / shareB.bin 是交付物，保留）
-/entangle
+# lang7 构建产物（均由 make / build_phone.sh 生成）
+lang7/build/
+lang7/entangle-cc
+lang7/c_cpp/libeng.so
+lang7/rust/target/
+lang7/rust/libentangle_rust.so
+lang7/verilog/sine.mem
+lang7/verilog/p_rom.mem
+lang7/verilog/golden_key.mem
+lang7/verilog/golden_p.mem
+lang7/verilog/sim_tb
 
-# tour / audit 运行产生的目录与日志
-/inbox/
-/out/
-/journal.log
-/audit_work/
-/tour.log
+__pycache__/

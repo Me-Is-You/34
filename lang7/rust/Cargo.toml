@@ -1,0 +1,14 @@
+[package]
+name = "entangle_rust"
+version = "34.99.0"
+edition = "2021"
+description = "七语言协同 · Rust 纠缠数学模块 (lang7)：浓度/深度/EPR 密钥，与 C 核心交叉验证"
+license = "MIT"
+
+[lib]
+name = "entangle_rust"
+crate-type = ["cdylib", "rlib"]
+
+[profile.release]
+opt-level = 3
+lto = true
