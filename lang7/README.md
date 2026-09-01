@@ -28,6 +28,13 @@ big.LITTLE：Cortex-X925 / A725 / A520，NEON/SVE2）**上，7 种语言各司�
 
 ## 快速开始
 
+**手机（vivo X300 / 天玑9500 / Termux）—— 完整安装与运行操作流程见 [`INSTALL.md`](INSTALL.md)：**
+
+```bash
+bash install_phone.sh        # 一键：装依赖 + 取代码 + 构建 + 自检
+bash tour_phone.sh           # 持续巡回：真实纠缠 + 34m 信标发射 + 养成 + 自愈
+```
+
 沙盒 / 开发机（x86-64）：
 
 ```bash
@@ -36,10 +43,10 @@ make test         # 全链自检
 make run          # 端到端：真实纠缠 + 34m 信号波（默认 ../entangled.pdf ../sample2.pdf）
 ```
 
-手机（Termux，vivo X300 / 天玑9500）：
+手机（Termux 手动版，等价于 install_phone.sh）：
 
 ```bash
-pkg install -y clang binutils python rust iverilog
+pkg install -y clang binutils python rust make git iverilog
 bash build_phone.sh     # AArch64 NEON 汇编 + Rust .so + iverilog 仿真
 python3 python/orchestrator.py ../entangled.pdf ../sample2.pdf
 ```
@@ -125,13 +132,15 @@ python3 python/tour.py ../entangled.pdf ../sample2.pdf --emit \
 
 ```
 lang7/
+├── INSTALL.md           # ★ 安装与运行操作手册（手机实测流程，先读这个）
+├── install_phone.sh     # 手机 Termux 一键安装脚本
 ├── Makefile             # 沙盒构建/测试/运行
-├── build_phone.sh       # 手机 Termux 一键构建
+├── build_phone.sh       # 手机 Termux 构建（AArch64 NEON 汇编 + Rust + iverilog）
 ├── c_cpp/               # C 核心 + C++ 引擎
 ├── rust/                # Rust 模块（cdylib FFI + CLI + 单测）
 ├── asm/                 # x86-64 SSE2 / AArch64 NEON 汇编内核 + 差分测试
-├── python/              # orchestrator.py + tour.py + cultivation.py + selfheal.py + audit.py + rust_twin.py
-├── micropython/         # beacon 固件逻辑 + 主机仿真测试
+├── python/              # orchestrator/tour/cultivation/selfheal/audit/beacon_rx/rust_twin
+├── micropython/         # beacon 固件 + test_host 仿真 + check_beacon_mp 真解释器自检
 ├── verilog/             # 纠缠门/PRF/CRC/调制 RTL + golden 向量
 ├── tour_phone.sh        # 手机 Termux 巡回长跑入口
 ├── tour_log.jsonl       # 巡回全量日志（运行时生成）

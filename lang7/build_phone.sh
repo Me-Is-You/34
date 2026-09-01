@@ -52,6 +52,12 @@ fi
 echo "[4/4] 自检"
 ./build/asmtest 2>/dev/null || true
 python3 micropython/test_host.py
+if command -v micropython >/dev/null 2>&1; then
+    echo "  [真 MicroPython 解释器]"
+    micropython micropython/check_beacon_mp.py
+else
+    echo "  [INFO] 未安装 micropython 包（可选）：pkg install micropython"
+fi
 echo "=== 构建完成 ==="
 echo "  单轮编排:  python3 python/orchestrator.py ../entangled.pdf ../sample2.pdf"
 echo "  巡回长跑:  bash tour_phone.sh            (Ctrl-C 停止并出十项属性审计)"
