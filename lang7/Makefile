@@ -97,7 +97,7 @@ run: libeng
 TOUR_ROUNDS ?= 0
 TOUR_EMIT   ?= 1
 tour: libeng
-	python3 python/tour.py $(PDF_A) $(PDF_B) --emit=$(TOUR_EMIT) \
+	python3 python/tour.py $(PDF_A) $(PDF_B) $(if $(filter 1,$(TOUR_EMIT)),--emit) \
 		--max-rounds $(TOUR_ROUNDS) --period 3 --beacon-period 2 \
 		--log tour_log.jsonl --curve tour_curve.jsonl
 
