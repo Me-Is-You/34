@@ -302,13 +302,34 @@ A：长度不同时，短的一方按周期填充参与配对；EPR 密钥只作
 
 ---
 
+## Python 单文件版（py/entangle34.py）
+
+**`py/`** 下只有一个程序文件 **`py/entangle34.py`**（Python 为主；C 与汇编、
+机器码源码**内嵌于文件内**，运行时自动编译为 `.so` 加速、无编译器自动回退纯
+Python）。它合并了全部功能：`entangle.cpp` 的每个模式 + 持续巡回 + **34m 信标
+发射 + 单机接收** + 实时四项仪表盘（浓度值/稳定值/浮动值/转换值）+ 养成模型 +
+自研自愈 + 十项科学审计。
+
+```bash
+python3 py/entangle34.py run                 # 可持续工作：巡回+发射+单机接收
+python3 py/entangle34.py entangle A.pdf B.pdf -o out.pdf
+python3 py/entangle34.py selftest            # 全链自检（26 项 PASS）
+```
+
+- 数学内核与 C++ 版**逐位一致**：相同参数下产物 `entangled.pdf` 与 C++ 版
+  **字节级相同**；Python 与 C++ 可互相 verify 对方的产物。
+- 📱 **vivo X300 / 天玑9500 / Termux**：把 `py/entangle34.py` 一个文件拷进手机，
+  `pkg install python clang`（clang 可选，加速用）后直接 `python3 entangle34.py run`。
+- 详见 [`py/README.md`](py/README.md)（单文件版说明）。
+
 ## 文件清单
 
 ```
-entangle.cpp   程序本体（约 1400 行，无第三方依赖，含 SHA-256、PDF 生成/解析器）
-Makefile       构建 / 演示 / 验证 / 审计 / tour
-README.md      本文件
-TERMUX.md      安卓手机实验指南
+entangle.cpp    程序本体 C++ 参考（约 1400 行，无第三方依赖）
+py/entangle34.py ★单文件程序：Python 为主、C/汇编机器码内嵌自编译（见 py/README.md）
+Makefile        构建 / 演示 / 验证 / 审计 / tour
+README.md       本文件
+TERMUX.md       安卓手机实验指南
 entangled.pdf  演示输出：叠加态容器（净深度 99.99%）
 shareA.bin     EPR 关联共享 A
 shareB.bin     EPR 关联共享 B

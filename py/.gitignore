@@ -1,0 +1,15 @@
+# 单文件版运行产物（全部可再生成）
+.ent34_cache/
+__pycache__/
+work34/
+work34*/
+audit_work/
+entangled.pdf
+shareA.bin
+shareB.bin
+report.txt
+model.txt
+journal.log
+inbox/
+out/
+*.so
