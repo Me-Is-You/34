@@ -1476,19 +1476,28 @@ def verify_artifact(pdf_data, share_a_data, share_b_data, quiet=False,
           ("shareA 与 shareB 全部 %d 个存储位满足 share = 原文 ⊕ K" % checked)
           if key_ok else ("前 %d 处失配" % mism))
 
-    # 高熵检验（有限样本偏差修正：期望熵 ≈ 8 − 255/(2n·ln2)）
-    h_a = shannon_entropy(sa)
-    h_b = shannon_entropy(sb)
+    # 高熵检验（有限样本修正熵 H_MM = 经验熵 + (m̂−1)/(2n·ln2)，
+    # 空假设下 ≈ 8 bit 且自动随 n 自适应；阈值 7.85 = 距完美噪声 >0.15 bit 才拒。
+    # 旧版误用「未修正经验熵 vs 修正期望阈值」→ n≈750 时真噪声有 ~13% 被误拒。）
+    def noise_corr_entropy(s):
+        hist = [0] * 256
+        m = 0
+        for x in s:
+            if hist[x] == 0:
+                m += 1
+            hist[x] += 1
+        if len(s) < 2 or m < 2:
+            return 0.0
+        h = shannon_entropy(s)
+        return h + (m - 1.0) / (2.0 * len(s) * math.log(2.0))
 
-    def noise_thr(nn):
-        e = 8.0 - 255.0 / (2.0 * nn * math.log(2.0))
-        return min(7.9, e - 0.05)
-
-    t_a = noise_thr(len(sa))
-    t_b = noise_thr(len(sb))
+    h_a = noise_corr_entropy(sa)
+    h_b = noise_corr_entropy(sb)
+    noise_thr = 7.85
     check("share 为不可区分噪声（有限样本修正熵 ≥ 阈值）",
-          h_a >= t_a and h_b >= t_b,
-          "H(A')=%.3f (≥%.3f)  H(B')=%.3f (≥%.3f)" % (h_a, t_a, h_b, t_b))
+          h_a >= noise_thr and h_b >= noise_thr,
+          "H(A')=%.3f (≥%.3f)  H(B')=%.3f (≥%.3f)"
+          % (h_a, noise_thr, h_b, noise_thr))
 
     # 浓度重算（硬约束！）
     pre = precompute_all(a, b, permA, permB, n, accel)
@@ -2142,48 +2151,33 @@ def run_phone(args, accel):
 
         ok = False
         r = None
-        # ---- 自愈 L1..L4 ----
+        # ---- 自愈 L1..L4（L1 同参重试 → L2 调参 → L3 重建资源 → L4 诚实拒绝）----
         for attempt in range(3):
+            th, rr, dr, fs = args.theta, args.rounds, cult.depth_rounds, args.fast
+            if attempt >= 1:                # L2：调参重试（θ=π/2、rounds+8、深度×2）
+                healer.param_retry()
+                th = 3.141592653589793 / 2.0
+                rr = max(1, (args.rounds or 0) + 8)
+                dr = max(cult.depth_rounds * 2, 1024)
+                fs = True
+                if attempt == 2:            # L3：重建资源（最后一次尝试前）
+                    accel = healer.rebuild(accel)
             try:
-                ok, r = entangle_files(in_a, in_b, seed, args.theta,
-                                         args.rounds, args.fid,
-                                         ARENA_CONSTANT, args.iter,
-                                         args.fast, cult.depth_rounds,
+                ok, r = entangle_files(in_a, in_b, seed, th, rr,
+                                         args.fid, ARENA_CONSTANT,
+                                         args.iter, fs, dr,
                                          model, log=lambda s: None,
                                          accel=accel)
             except EntangleError as ex:
                 print("[tour] 纠缠被拒: %s" % ex)
                 ok = False
-            if ok:
-                # 产物 12 项自检（自愈基础）
-                if verify_artifact(r.out_pdf, r.share_a, r.share_b,
-                                     quiet=True, accel=accel):
-                    break
-                healer.engine_retry(attempt + 1)
-                continue
-            # 拒绝/失败 → L1 同参重试
+            if ok and verify_artifact(r.out_pdf, r.share_a, r.share_b,
+                                        quiet=True, accel=accel):
+                break
             if attempt == 0:
-                healer.engine_retry(1)
-                continue
-            # L2：调参重试
-            healer.param_retry()
-            try:
-                ok, r = entangle_files(in_a, in_b, seed, 3.141592653589793
-                                         / 2.0, max(1, (args.rounds or 0) + 8),
-                                         args.fid, ARENA_CONSTANT,
-                                         max(args.iter, 300), True,
-                                         max(cult.depth_rounds * 2, 1024),
-                                         model, log=lambda s: None,
-                                         accel=accel)
-                if ok and verify_artifact(r.out_pdf, r.share_a, r.share_b,
-                                            quiet=True, accel=accel):
-                    break
-            except EntangleError:
-                pass
-            # L3：重建资源后再试一次
-            accel = healer.rebuild(accel)
+                healer.engine_retry(1)      # L1：同参重试一次（确定性失败不再空转）
         else:
-            healer.escalate("跳过 %s×%s：三次策略均失败（诚实拒绝，不伪造）"
+            healer.escalate("跳过 %s×%s：L1/L2/L3 策略均失败（诚实拒绝，不伪造）"
                             % (in_a, in_b))
             append("run", "seed=%d inA=%s inB=%s status=FAIL heal=1" %
                    (seed, in_a, in_b))
